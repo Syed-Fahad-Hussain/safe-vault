@@ -11,6 +11,10 @@ import Config from '../config/config'
 import ipfs from '../ipfs';
 import { read } from 'fs';
 
+import {storage} from '../config/firebaseConfiguration';
+
+
+
 const factor = 1000000000000000000;
 
 // Current test contract on Ropsten testnet
@@ -42,9 +46,9 @@ var encryptedData = {
 var web3 = null
 
 // Gas price on the blockchain
-var gasPrice = 0
+// var gasPrice = 0
 // Fee to be charged to the user
-var feeToCharge = 0
+// var feeToCharge = 0
 
 // Private key of the user (used for encryption)
 var privateKey = ''
@@ -93,7 +97,7 @@ class Write extends Component {
         storageContract = contract.at(contractAddress);
 
         web3.eth.getAccounts((error, accounts) => {
-            if (accounts.length == 0) {
+            if (accounts.length === 0) {
                 alert("Metamask not set up.")
             }
             mAccounts = accounts
@@ -127,103 +131,103 @@ class Write extends Component {
         return transitmessage;
     }
 
-    estimateGas() {
-        if (data.value != '' && data.ipfsHash != '') {
-            feeToCharge = (Config.fileUploadCharge / Config.ETHToUSDExchangeRate + Config.dataWriteCharge / Config.ETHToUSDExchangeRate)
-            encryptedData.value = this.encrypt(data.value, privateKey)
-            encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
-        } else if (data.value != '' && data.ipfsHash == '') {
-            feeToCharge = Config.dataWriteCharge / Config.ETHToUSDExchangeRate
-            encryptedData.value = this.encrypt(data.value, privateKey)
-        } else if (data.value == '' && data.ipfsHash != '') {
-            feeToCharge = Config.fileUploadCharge / Config.ETHToUSDExchangeRate
-            encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
-        }
+    // estimateGas() {
+    //     if (data.value != '' && data.ipfsHash != '') {
+    //         feeToCharge = (Config.fileUploadCharge / Config.ETHToUSDExchangeRate + Config.dataWriteCharge / Config.ETHToUSDExchangeRate)
+    //         encryptedData.value = this.encrypt(data.value, privateKey)
+    //         encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
+    //     } else if (data.value != '' && data.ipfsHash == '') {
+    //         feeToCharge = Config.dataWriteCharge / Config.ETHToUSDExchangeRate
+    //         encryptedData.value = this.encrypt(data.value, privateKey)
+    //     } else if (data.value == '' && data.ipfsHash != '') {
+    //         feeToCharge = Config.fileUploadCharge / Config.ETHToUSDExchangeRate
+    //         encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
+    //     }
 
-        return storageContract.addData.estimateGas(data.key, encryptedData.value, encryptedData.ipfsHash, {
-            from: mAccounts[0],
-            value: web3.toWei(feeToCharge, 'ether'),
-            gasPrice: gasPrice
-        }, ((error, result) => {
-            if (error != null) {
-                console.log(error)
-            } else {
-                console.log("Estimated startGas: " + result)
-                this.setState({ gasLimit: result })
-                this.setState({ currentStatus: "Gas estimated." })
-                this.openConfirmationDialog()
-            }
-        }))
-    }
+    //     return storageContract.addData.estimateGas(data.key, encryptedData.value, encryptedData.ipfsHash, {
+    //         from: mAccounts[0],
+    //         value: web3.toWei(feeToCharge, 'ether'),
+    //         gasPrice: gasPrice
+    //     }, ((error, result) => {
+    //         if (error != null) {
+    //             console.log(error)
+    //         } else {
+    //             console.log("Estimated startGas: " + result)
+    //             this.setState({ gasLimit: result })
+    //             this.setState({ currentStatus: "Gas estimated." })
+    //             this.openConfirmationDialog()
+    //         }
+    //     }))
+    // }
 
-    getGasPrice() {
-        web3.eth.getGasPrice(((err, res) => {
-            gasPrice = res
-        }))
-    }
+    // getGasPrice() {
+    //     web3.eth.getGasPrice(((err, res) => {
+    //         gasPrice = res
+    //     }))
+    // }
 
-    addData() {
-        this.setState({ currentStatus: "Adding data. Please wait.." })
-        if (data.ipfsHash != '') {
-            encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
-        }
-        return storageContract.addData(data.key, encryptedData.value, encryptedData.ipfsHash, {
-            from: mAccounts[0],
-            gas: this.state.gasLimit,
-            gasPrice: gasPrice,
-            value: web3.toWei(feeToCharge, 'ether')
-        }, ((error, result) => {
-            if (error === null) {
-                this.setState({ currentStatus: "Transaction has gone through. Please wait for it to mine.." })
-                alert("Transaction has gone through. You can check the status at ropsten.etherscan.io/tx/" + result)
-                var event = storageContract.DataAdded()
-                event.watch((err, res) => {
-                    if (err === null) {
-                        this.setState({ currentStatus: "Transaction has been mined. You can read the data now." })
-                        alert("Transaction has been mined.")
-                    }
-                })
-            }
-        }))
-    }
+    // addData() {
+    //     this.setState({ currentStatus: "Adding data. Please wait.." })
+    //     if (data.ipfsHash != '') {
+    //         encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
+    //     }
+    //     return storageContract.addData(data.key, encryptedData.value, encryptedData.ipfsHash, {
+    //         from: mAccounts[0],
+    //         gas: this.state.gasLimit,
+    //         gasPrice: gasPrice,
+    //         value: web3.toWei(feeToCharge, 'ether')
+    //     }, ((error, result) => {
+    //         if (error === null) {
+    //             this.setState({ currentStatus: "Transaction has gone through. Please wait for it to mine.." })
+    //             alert("Transaction has gone through. You can check the status at ropsten.etherscan.io/tx/" + result)
+    //             var event = storageContract.DataAdded()
+    //             event.watch((err, res) => {
+    //                 if (err === null) {
+    //                     this.setState({ currentStatus: "Transaction has been mined. You can read the data now." })
+    //                     alert("Transaction has been mined.")
+    //                 }
+    //             })
+    //         }
+    //     }))
+    // }
 
-    onSaveData(event) {
-        event.preventDefault();
-        if (data.value === '' && data.ipfsHash === '') {
-            alert("Please enter data or select file to upload")
-            return
-        }
-        if (data.key === ''
-            || mAccounts[0] === ''
-            || privateKey === ''
-        ) {
-            alert("All the fields are required");
-            return
-        }
-        if (mAccounts.length == 0) {
-            alert("Metamask not set up")
-            return
-        }
+    // onSaveData(event) {
+    //     event.preventDefault();
+    //     if (data.value === '' && data.ipfsHash === '') {
+    //         alert("Please enter data or select file to upload")
+    //         return
+    //     }
+    //     if (data.key === ''
+    //         || mAccounts[0] === ''
+    //         || privateKey === ''
+    //     ) {
+    //         alert("All the fields are required");
+    //         return
+    //     }
+    //     if (mAccounts.length == 0) {
+    //         alert("Metamask not set up")
+    //         return
+    //     }
 
-        this.setState({ currentStatus: "Estimating gas.." })
-        this.estimateGas()
-    }
+    //     this.setState({ currentStatus: "Estimating gas.." })
+    //     this.estimateGas()
+    // }
 
-    openConfirmationDialog() {
-        var retVal = confirm("Transaction cost will be $" + ((gasPrice * this.state.gasLimit) / factor + feeToCharge * Config.ETHToUSDExchangeRate) + ". Do you want to continue ?");
-        if (retVal == true) {
-            if (data.ipfsHash != 0) {
-                this.uploadFile()
-            }
-            else {
-                this.addData()
-            }
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+    // openConfirmationDialog() {
+    //     var retVal = confirm("Transaction cost will be $" + ((gasPrice * this.state.gasLimit) / factor + feeToCharge * Config.ETHToUSDExchangeRate) + ". Do you want to continue ?");
+    //     if (retVal == true) {
+    //         if (data.ipfsHash != 0) {
+    //             this.uploadFile()
+    //         }
+    //         else {
+    //             this.addData()
+    //         }
+    //         return true;
+    //     }
+    //     else {
+    //         return false;
+    //     }
+    // }
 
     onKeyChange(event) {
         data.key = event.target.value
@@ -257,9 +261,15 @@ class Write extends Component {
         let reader = new window.FileReader()
         reader.readAsDataURL(file)
 
+        // reader.onloadend = (e) => {
+        //     fileContent = e.target.result;
+        //     data.ipfsHash = 'QmVunwR4mvC4F5eTYWCGU3Baq9kmaTyRPot6nRGp24D4aJ'
+        // }
+
         reader.onloadend = (e) => {
             fileContent = e.target.result;
-            data.ipfsHash = 'QmVunwR4mvC4F5eTYWCGU3Baq9kmaTyRPot6nRGp24D4aJ'
+            let md5 = CryptoJS.MD5(fileContent);
+            data.ipfsHash = md5;
         }
     };
 
@@ -267,14 +277,33 @@ class Write extends Component {
         const buffer = await Buffer.from(reader.result);
         this.setState({ buffer: buffer });
 
-        await ipfs.add(this.state.buffer, (err, ipfsHash) => {
-            if (err == null) {
-                data.ipfsHash = ipfsHash[0].hash
-                this.addData()
-            } else {
-                console.log(err);
-            }
-        })
+        // await ipfs.add(this.state.buffer, (err, ipfsHash) => {
+        //     if (err == null) {
+        //         data.ipfsHash = ipfsHash[0].hash
+        //         this.addData()
+        //     } else {
+        //         console.log(err);
+        //     }
+        // })
+
+        
+            // Create a root reference
+        var storageRef = storage.ref("safe-vault");
+
+        // // Create a reference to 'mountains.jpg'
+        // var mountainsRef = storageRef.child('mountains.jpg');
+
+        // // Create a reference to 'images/mountains.jpg'
+        // var mountainImagesRef = storageRef.child('images/mountains.jpg');
+
+        // // While the file names are the same, the references point to different files
+        // mountainsRef.name === mountainImagesRef.name            // true
+        // mountainsRef.fullPath === mountainImagesRef.fullPath    // false
+
+        var file = this.state.buffer; // use the Blob or File API
+        storageRef.put(file).then(function(snapshot) {
+        console.log('Uploaded a blob or file!');
+});
     };
 
     render() {
@@ -284,14 +313,14 @@ class Write extends Component {
                     <Row style={{ marginBottom: 0 }}>
                         <Col s={3}></Col>
                         <Col s={6}>
-                            <Label style={{ color: 'blue' }}>Save any information on the blockchain fully encrypted. The cost is $1 for data and $5 for a document. Please remember your private key as this will be used to decrypt and read your information when you need it. Use BlockSave to save contracts and other important information that need to be public, but secure and encrypted. BlockSave is useful for Legal, Real Estate, Insurance, Financial contracts and for many other industries.</Label>
+                            <Label style={{ color: 'blue' }}>Save any information on the blockchain fully encrypted. Please remember your private key as this will be used to decrypt and read your information when you need it. Use BlockSave to save contracts and other important information that need to be public, but secure and encrypted. BlockSave is useful for Legal, Real Estate, Insurance, Financial contracts and for many other industries.</Label>
                             <br />
                             <br />
-                            <Label style={{ color: 'blue' }}>Please enter a key that you can use later to read back your information, this is like an index key</Label>
+                            {/* <Label style={{ color: 'blue' }}>Please enter a key that you can use later to read back your information, this is like an index key</Label>
                             <br />
                             <Input s={12} type='text' onChange={this.onKeyChange.bind(this)} name='ID1' label="Enter Key here" />
                             <Label style={{ color: 'blue' }}>Either type or copy and paste any text here that you would like stored and encrypted on the blockchain</Label>
-                            <textarea rows="30" style={{ "height": "250px", "maxHeight": "700px" }} maxLength="3000" className="textarea" type='text' onChange={this.onValueChange.bind(this)} label="Value" name='ID2' />
+                            <textarea rows="30" style={{ "height": "250px", "maxHeight": "700px" }} maxLength="3000" className="textarea" type='text' onChange={this.onValueChange.bind(this)} label="Value" name='ID2' /> */}
                             <Label style={{ color: 'blue' }}>Please select a document, preferably a pdf, to store and upload. The document will be encrypted to protect it</Label>
                             <br />
                             <input

@@ -59,7 +59,7 @@ class Read extends Component {
         storageContract = contract.at(contractAddress);
 
         web3.eth.getAccounts((error, accounts) => {
-            if (accounts.length == 0) {
+            if (accounts.length === 0) {
                 alert("Metamask not set up.")
             }
             mAccounts = accounts
@@ -92,9 +92,10 @@ class Read extends Component {
     }
 
     getData() {
-        return storageContract.getData.call(key, { from: mAccounts[0] }, ((error, result) => {
+        // return storageContract.getData.call(key, { from: mAccounts[0] }, ((error, result) => {
+        return storageContract.getData.call(fileHash, { from: mAccounts[0] }, ((error, result) => {
             var decryptedData = this.decrypt(result[0], privateKey).toString(CryptoJS.enc.Utf8)
-            fileHash = this.decrypt(result[1], privateKey).toString(CryptoJS.enc.Utf8)
+            // fileHash = this.decrypt(result[1], privateKey).toString(CryptoJS.enc.Utf8)
             this.setState({
                 value: decryptedData
             })
@@ -104,7 +105,7 @@ class Read extends Component {
 
     onReadData(event) {
         event.preventDefault();
-        if (key == '' || privateKey == '') {
+        if (fileHash === '' || privateKey === '') {
             alert("All fields are required");
         }
         else {
@@ -113,8 +114,12 @@ class Read extends Component {
         }
     }
 
-    onKeyChange(event) {
-        key = event.target.value
+    // onKeyChange(event) {
+    //     key = event.target.value
+    // }
+
+    onFileHashChange(event) {
+        fileHash = event.target.value
     }
 
     onPrivateKeyChange(event) {
@@ -130,7 +135,8 @@ class Read extends Component {
         this.setState({ currentStatus: "Downloading file. Please wait.." })
         var link = document.createElement("a");
         link.download = fileHash;
-        link.href = "https://ipfs.io/ipfs/" + fileHash;
+        // link.href = "https://ipfs.io/ipfs/" + fileHash;
+        link.href = "https://safe-vault-with-tokens.firebaseio.com/" + fileHash;
         document.body.appendChild(link);
 
         var request = new XMLHttpRequest();
@@ -175,8 +181,8 @@ class Read extends Component {
                             <Label style={{ color: 'blue' }}>Please enter the password that you used to encrypt this data when you stored it using Write</Label>
                             <Input s={12} type='password' onChange={this.onPrivateKeyChange.bind(this)} name='privateKey' label="Enter Private Key here (used to decrypt data)" />
                             <br />
-                            <Label style={{ color: 'blue' }}>Please enter the index key that you used when you encrypted your data or file</Label>
-                            <Input s={12} type='text' name='EntryID' onChange={this.onKeyChange.bind(this)} label="Enter Key here" />
+                            <Label style={{ color: 'blue' }}>Please enter the Hash key in order to locate your data or file</Label>
+                            <Input s={12} type='text' name='EntryID' onChange={this.onFileHashChange.bind(this)} label="Enter HashKey here" />
                             <div > Data: </div>
                             <p>
                                 {nl2br(this.state.value)}

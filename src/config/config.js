@@ -1,5 +1,5 @@
 let config = {
-    ETHToUSDExchangeRate: 610,
+    // ETHToUSDExchangeRate: 610,
     dataWriteCharge: 1,
     fileUploadCharge: 5
 }
