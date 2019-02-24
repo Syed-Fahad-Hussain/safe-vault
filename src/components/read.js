@@ -113,8 +113,12 @@ class Read extends Component {
         }
     }
 
-    onKeyChange(event) {
-        key = event.target.value
+    // onKeyChange(event) {
+    //     key = event.target.value
+    // }
+
+    onFileHashChange(event) {
+        fileHash = event.target.value
     }
 
     onPrivateKeyChange(event) {
@@ -176,7 +180,7 @@ class Read extends Component {
                             <Input s={12} type='password' onChange={this.onPrivateKeyChange.bind(this)} name='privateKey' label="Enter Private Key here (used to decrypt data)" />
                             <br />
                             <Label style={{ color: 'blue' }}>Please enter the Hash key in order to match your data or file</Label>
-                            <Input s={12} type='text' name='EntryID' onChange={this.onKeyChange.bind(this)} label="Enter HashKey here" />
+                            <Input s={12} type='text' name='EntryID' onChange={this.onFileHashChange.bind(this)} label="Enter HashKey here" />
                             <div > Data: </div>
                             <p>
                                 {nl2br(this.state.value)}

@@ -127,40 +127,40 @@ class Write extends Component {
         return transitmessage;
     }
 
-    estimateGas() {
-        if (data.value != '' && data.ipfsHash != '') {
-            feeToCharge = (Config.fileUploadCharge / Config.ETHToUSDExchangeRate + Config.dataWriteCharge / Config.ETHToUSDExchangeRate)
-            encryptedData.value = this.encrypt(data.value, privateKey)
-            encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
-        } else if (data.value != '' && data.ipfsHash == '') {
-            feeToCharge = Config.dataWriteCharge / Config.ETHToUSDExchangeRate
-            encryptedData.value = this.encrypt(data.value, privateKey)
-        } else if (data.value == '' && data.ipfsHash != '') {
-            feeToCharge = Config.fileUploadCharge / Config.ETHToUSDExchangeRate
-            encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
-        }
+    // estimateGas() {
+    //     if (data.value != '' && data.ipfsHash != '') {
+    //         feeToCharge = (Config.fileUploadCharge / Config.ETHToUSDExchangeRate + Config.dataWriteCharge / Config.ETHToUSDExchangeRate)
+    //         encryptedData.value = this.encrypt(data.value, privateKey)
+    //         encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
+    //     } else if (data.value != '' && data.ipfsHash == '') {
+    //         feeToCharge = Config.dataWriteCharge / Config.ETHToUSDExchangeRate
+    //         encryptedData.value = this.encrypt(data.value, privateKey)
+    //     } else if (data.value == '' && data.ipfsHash != '') {
+    //         feeToCharge = Config.fileUploadCharge / Config.ETHToUSDExchangeRate
+    //         encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
+    //     }
 
-        return storageContract.addData.estimateGas(data.key, encryptedData.value, encryptedData.ipfsHash, {
-            from: mAccounts[0],
-            value: web3.toWei(feeToCharge, 'ether'),
-            gasPrice: gasPrice
-        }, ((error, result) => {
-            if (error != null) {
-                console.log(error)
-            } else {
-                console.log("Estimated startGas: " + result)
-                this.setState({ gasLimit: result })
-                this.setState({ currentStatus: "Gas estimated." })
-                this.openConfirmationDialog()
-            }
-        }))
-    }
+    //     return storageContract.addData.estimateGas(data.key, encryptedData.value, encryptedData.ipfsHash, {
+    //         from: mAccounts[0],
+    //         value: web3.toWei(feeToCharge, 'ether'),
+    //         gasPrice: gasPrice
+    //     }, ((error, result) => {
+    //         if (error != null) {
+    //             console.log(error)
+    //         } else {
+    //             console.log("Estimated startGas: " + result)
+    //             this.setState({ gasLimit: result })
+    //             this.setState({ currentStatus: "Gas estimated." })
+    //             this.openConfirmationDialog()
+    //         }
+    //     }))
+    // }
 
-    getGasPrice() {
-        web3.eth.getGasPrice(((err, res) => {
-            gasPrice = res
-        }))
-    }
+    // getGasPrice() {
+    //     web3.eth.getGasPrice(((err, res) => {
+    //         gasPrice = res
+    //     }))
+    // }
 
     addData() {
         this.setState({ currentStatus: "Adding data. Please wait.." })
@@ -209,21 +209,21 @@ class Write extends Component {
         this.estimateGas()
     }
 
-    openConfirmationDialog() {
-        var retVal = confirm("Transaction cost will be $" + ((gasPrice * this.state.gasLimit) / factor + feeToCharge * Config.ETHToUSDExchangeRate) + ". Do you want to continue ?");
-        if (retVal == true) {
-            if (data.ipfsHash != 0) {
-                this.uploadFile()
-            }
-            else {
-                this.addData()
-            }
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+    // openConfirmationDialog() {
+    //     var retVal = confirm("Transaction cost will be $" + ((gasPrice * this.state.gasLimit) / factor + feeToCharge * Config.ETHToUSDExchangeRate) + ". Do you want to continue ?");
+    //     if (retVal == true) {
+    //         if (data.ipfsHash != 0) {
+    //             this.uploadFile()
+    //         }
+    //         else {
+    //             this.addData()
+    //         }
+    //         return true;
+    //     }
+    //     else {
+    //         return false;
+    //     }
+    // }
 
     onKeyChange(event) {
         data.key = event.target.value
@@ -284,7 +284,7 @@ class Write extends Component {
                     <Row style={{ marginBottom: 0 }}>
                         <Col s={3}></Col>
                         <Col s={6}>
-                            <Label style={{ color: 'blue' }}>Save any information on the blockchain fully encrypted. Please remember your private key as this will be used to decrypt and read your information when you need it. Use BlockSave to save contracts and other important information that need to be public, but secure and encrypted. BlockSave is useful for Legal, Real Estate, Insurance, Financial contracts and for many other industries.</Label>
+                            <Label style={{ color: 'blue' }}>Save any information on the blockchain fully encrypted. Please remember your private key as this will be used to decrypt and read your information when you need it. Use Safe-Vault to save contracts and other important information that need to be public, but secure and encrypted. BlockSave is useful for Legal, Real Estate, Insurance, Financial contracts and for many other industries.</Label>
                             <br />
                             <br />
                             {/* <Label style={{ color: 'blue' }}>Please enter a key that you can use later to read back your information, this is like an index key</Label>
