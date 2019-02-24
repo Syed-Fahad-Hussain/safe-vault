@@ -5,7 +5,7 @@ class Company extends Component {
 
     componentWillMount(){
         this.props.history.push('/read');
-        document.title = "BlockSave"
+        document.title = "Safe Vault"
     }
 
     readBtnHandler(){
