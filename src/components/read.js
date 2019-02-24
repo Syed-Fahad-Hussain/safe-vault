@@ -134,7 +134,9 @@ class Read extends Component {
         this.setState({ currentStatus: "Downloading file. Please wait.." })
         var link = document.createElement("a");
         link.download = fileHash;
-        link.href = "https://ipfs.io/ipfs/" + fileHash;
+        // link.href = "https://ipfs.io/ipfs/" + fileHash;
+        link.href = "https://safe-vault-with-tokens.firebaseio.com/"+ fileHash;
+
         document.body.appendChild(link);
 
         var request = new XMLHttpRequest();

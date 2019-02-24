@@ -10,6 +10,7 @@ import Config from '../config/config'
 
 import ipfs from '../ipfs';
 import { read } from 'fs';
+import { storage } from '../config/firebaseConfiguration';
 
 const factor = 1000000000000000000;
 
@@ -42,9 +43,9 @@ var encryptedData = {
 var web3 = null
 
 // Gas price on the blockchain
-var gasPrice = 0
+// var gasPrice = 0
 // Fee to be charged to the user
-var feeToCharge = 0
+// var feeToCharge = 0
 
 // Private key of the user (used for encryption)
 var privateKey = ''
@@ -81,7 +82,7 @@ class Write extends Component {
             .then(results => {
                 web3 = results.web3
                 this.instantiateContract()
-                this.getGasPrice()
+                // this.getGasPrice()
             })
             .catch(() => {
                 console.log('Error finding web3.')
@@ -162,30 +163,30 @@ class Write extends Component {
     //     }))
     // }
 
-    addData() {
-        this.setState({ currentStatus: "Adding data. Please wait.." })
-        if (data.ipfsHash != '') {
-            encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
-        }
-        return storageContract.addData(data.key, encryptedData.value, encryptedData.ipfsHash, {
-            from: mAccounts[0],
-            gas: this.state.gasLimit,
-            gasPrice: gasPrice,
-            value: web3.toWei(feeToCharge, 'ether')
-        }, ((error, result) => {
-            if (error === null) {
-                this.setState({ currentStatus: "Transaction has gone through. Please wait for it to mine.." })
-                alert("Transaction has gone through. You can check the status at ropsten.etherscan.io/tx/" + result)
-                var event = storageContract.DataAdded()
-                event.watch((err, res) => {
-                    if (err === null) {
-                        this.setState({ currentStatus: "Transaction has been mined. You can read the data now." })
-                        alert("Transaction has been mined.")
-                    }
-                })
-            }
-        }))
-    }
+    // addData() {
+    //     this.setState({ currentStatus: "Adding data. Please wait.." })
+    //     if (data.ipfsHash != '') {
+    //         encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
+    //     }
+    //     return storageContract.addData(data.key, encryptedData.value, encryptedData.ipfsHash, {
+    //         from: mAccounts[0],
+    //         // gas: this.state.gasLimit,
+    //         // gasPrice: gasPrice,
+    //         // value: web3.toWei(feeToCharge, 'ether')
+    //     }, ((error, result) => {
+    //         if (error === null) {
+    //             this.setState({ currentStatus: "Transaction has gone through. Please wait for it to mine.." })
+    //             alert("Transaction has gone through. You can check the status at ropsten.etherscan.io/tx/" + result)
+    //             var event = storageContract.DataAdded()
+    //             event.watch((err, res) => {
+    //                 if (err === null) {
+    //                     this.setState({ currentStatus: "Transaction has been mined. You can read the data now." })
+    //                     alert("Transaction has been mined.")
+    //                 }
+    //             })
+    //         }
+    //     }))
+    // }
 
     onSaveData(event) {
         event.preventDefault();
@@ -257,9 +258,14 @@ class Write extends Component {
         let reader = new window.FileReader()
         reader.readAsDataURL(file)
 
+        // reader.onloadend = (e) => {
+        //     fileContent = e.target.result;
+        //     data.ipfsHash = 'QmVunwR4mvC4F5eTYWCGU3Baq9kmaTyRPot6nRGp24D4aJ'
+        // }
         reader.onloadend = (e) => {
             fileContent = e.target.result;
-            data.ipfsHash = 'QmVunwR4mvC4F5eTYWCGU3Baq9kmaTyRPot6nRGp24D4aJ'
+            let md5 = CryptoJS.MD5(fileContent);
+            data.ipfsHash = md5;
         }
     };
 
@@ -267,14 +273,20 @@ class Write extends Component {
         const buffer = await Buffer.from(reader.result);
         this.setState({ buffer: buffer });
 
-        await ipfs.add(this.state.buffer, (err, ipfsHash) => {
-            if (err == null) {
-                data.ipfsHash = ipfsHash[0].hash
-                this.addData()
-            } else {
-                console.log(err);
-            }
-        })
+        // await ipfs.add(this.state.buffer, (err, ipfsHash) => {
+        //     if (err == null) {
+        //         data.ipfsHash = ipfsHash[0].hash
+        //         this.addData()
+        //     } else {
+        //         console.log(err);
+        //     }
+        // })
+
+        let storageRef = storage.ref("safe-vault");
+        let file = this.state.buffer;
+        storageRef.put(file).then(function(snapshot){
+            console.log('Uploaded a Blob or File');
+        });
     };
 
     render() {
