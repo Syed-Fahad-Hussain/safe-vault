@@ -27,17 +27,18 @@ var storageContract
 var mAccounts
 
 // Data object
-var data = {
+// var data = {}
     // key: '',
-    value: '',
-    ipfsHash: ''
-}
+    // value: '',
+
+var fileHash = '';
+
 
 // Encrypted Data object
-var encryptedData = {
-    value: '',
-    ipfsHash: ''
-}
+// var encryptedData = {
+//     value: '',
+//     ipfsHash: ''
+// }
 
 // Web3 instance
 var web3 = null
@@ -68,14 +69,16 @@ class Write extends Component {
         }
     }
 
-    componentWillUnmount() {
-        // data.key = ''
-        data.value = ''
-        data.ipfsHash = ''
+    // componentWillUnmount() {
+    //     // data.key = ''
+    //     // data.value = ''
+    //     // data.ipfsHash = ''
 
-        encryptedData.value = ''
-        encryptedData.ipfsHash = ''
-    }
+    //     // fileHash = '';
+        
+    //     // encryptedData.value = ''
+    //     // encryptedData.ipfsHash = ''
+    // }
 
     componentWillMount() {
         getWeb3
@@ -190,16 +193,21 @@ class Write extends Component {
 
     onSaveData(event) {
         event.preventDefault();
-        if (data.value === '' && data.ipfsHash === '') {
-            alert("Please enter data or select file to upload")
+        
+        // if (data.value === '' && data.ipfsHash === '') {
+        //     alert("Please enter data or select file to upload")
+        //     return
+        // }
+
+        if (fileHash === '') {
+            alert("Please select file to upload")
             return
         }
-        if (
-            // data.key === ''
-            // || 
-            mAccounts[0] === ''
-            || privateKey === ''
-        ) {
+        // if (data.key === ''
+        //     ||mAccounts[0] === ''
+        //     || privateKey === ''
+        // ) 
+        if (mAccounts[0] === '' || privateKey === '') {
             alert("All the fields are required");
             return
         }
@@ -232,9 +240,9 @@ class Write extends Component {
     //     data.key = event.target.value
     // }
 
-    onValueChange(event) {
-        data.value = event.target.value
-    }
+    // onValueChange(event) {
+    //     data.value = event.target.value
+    // }
 
     onPrivateKeyChange(event) {
         privateKey = event.target.value
@@ -267,7 +275,7 @@ class Write extends Component {
         reader.onloadend = (e) => {
             fileContent = e.target.result;
             var md5 = CryptoJS.MD5(fileContent);
-            data.ipfsHash = md5;
+            fileHash = md5;
         }
     };
 
