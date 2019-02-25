@@ -28,7 +28,7 @@ var mAccounts
 
 // Data object
 var data = {
-    key: '',
+    // key: '',
     value: '',
     ipfsHash: ''
 }
@@ -69,7 +69,7 @@ class Write extends Component {
     }
 
     componentWillUnmount() {
-        data.key = ''
+        // data.key = ''
         data.value = ''
         data.ipfsHash = ''
 
@@ -194,8 +194,10 @@ class Write extends Component {
             alert("Please enter data or select file to upload")
             return
         }
-        if (data.key === ''
-            || mAccounts[0] === ''
+        if (
+            // data.key === ''
+            // || 
+            mAccounts[0] === ''
             || privateKey === ''
         ) {
             alert("All the fields are required");
@@ -206,8 +208,8 @@ class Write extends Component {
             return
         }
 
-        this.setState({ currentStatus: "Estimating gas.." })
-        this.estimateGas()
+        // this.setState({ currentStatus: "Estimating gas.." })
+        // this.estimateGas()
     }
 
     // openConfirmationDialog() {
@@ -226,9 +228,9 @@ class Write extends Component {
     //     }
     // }
 
-    onKeyChange(event) {
-        data.key = event.target.value
-    }
+    // onKeyChange(event) {
+    //     data.key = event.target.value
+    // }
 
     onValueChange(event) {
         data.value = event.target.value
@@ -264,7 +266,7 @@ class Write extends Component {
         // }
         reader.onloadend = (e) => {
             fileContent = e.target.result;
-            let md5 = CryptoJS.MD5(fileContent);
+            var md5 = CryptoJS.MD5(fileContent);
             data.ipfsHash = md5;
         }
     };

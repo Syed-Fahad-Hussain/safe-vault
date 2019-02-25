@@ -92,9 +92,10 @@ class Read extends Component {
     }
 
     getData() {
-        return storageContract.getData.call(key, { from: mAccounts[0] }, ((error, result) => {
+        // return storageContract.getData.call(key, { from: mAccounts[0] }, ((error, result) => {
+            return storageContract.getData.call(fileHash, { from: mAccounts[0] }, ((error, result) => {
             var decryptedData = this.decrypt(result[0], privateKey).toString(CryptoJS.enc.Utf8)
-            fileHash = this.decrypt(result[1], privateKey).toString(CryptoJS.enc.Utf8)
+            // fileHash = this.decrypt(result[1], privateKey).toString(CryptoJS.enc.Utf8)
             this.setState({
                 value: decryptedData
             })
@@ -104,7 +105,7 @@ class Read extends Component {
 
     onReadData(event) {
         event.preventDefault();
-        if (key == '' || privateKey == '') {
+        if (fileHash == '' || privateKey == '') {
             alert("All fields are required");
         }
         else {
