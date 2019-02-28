@@ -4,58 +4,33 @@ import { Label } from 'react-bootstrap'
 import { Nav, NavItem } from 'react-bootstrap';
 import Textarea from 'react-expanding-textarea'
 import CryptoJS from 'crypto-js';
-
 import getWeb3 from '../utils/getWeb3'
 import Config from '../config/config'
 
 import ipfs from '../ipfs';
 import { read } from 'fs';
 import { storage } from '../config/firebaseConfiguration';
+const sha256 = require('sha-256-js');
+const utf8 = require('utf8');
+
 
 const factor = 1000000000000000000;
-
-// Current test contract on Ropsten testnet
-// const contractAddress = '0x318cb3fb7933bb100ae5c57551f375c2093ae695'
 
 // Current contract on Ethereum main net
 const contractAddress = '0x7e0dc1fe2f7a8b9db037aaf3e47244885a059620'
 
 // Contract instance
 var storageContract
-
-// Accounts
 var mAccounts
-
-// Data object
-// var data = {}
-    // key: '',
-    // value: '',
-
 var fileHash = '';
-
-
-// Encrypted Data object
-// var encryptedData = {
-//     value: '',
-//     ipfsHash: ''
-// }
-
-// Web3 instance
 var web3 = null
-
-// Gas price on the blockchain
-// var gasPrice = 0
-// Fee to be charged to the user
-// var feeToCharge = 0
-
-// Private key of the user (used for encryption)
 var privateKey = ''
 
-// Encryption parameters
 var keySize = 256;
 var ivSize = 128;
 var iterations = 100;
 
+var fileName = ''
 var fileContent = ''
 
 class Write extends Component {
@@ -65,20 +40,10 @@ class Write extends Component {
             gasLimit: 0,
             transactionStateMessage: '',
             buffer: '',
-            currentStatus: ''
+            currentStatus: '',
+            HashStateMessage: ''
         }
     }
-
-    // componentWillUnmount() {
-    //     // data.key = ''
-    //     // data.value = ''
-    //     // data.ipfsHash = ''
-
-    //     // fileHash = '';
-        
-    //     // encryptedData.value = ''
-    //     // encryptedData.ipfsHash = ''
-    // }
 
     componentWillMount() {
         getWeb3
@@ -131,82 +96,15 @@ class Write extends Component {
         return transitmessage;
     }
 
-    // estimateGas() {
-    //     if (data.value != '' && data.ipfsHash != '') {
-    //         feeToCharge = (Config.fileUploadCharge / Config.ETHToUSDExchangeRate + Config.dataWriteCharge / Config.ETHToUSDExchangeRate)
-    //         encryptedData.value = this.encrypt(data.value, privateKey)
-    //         encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
-    //     } else if (data.value != '' && data.ipfsHash == '') {
-    //         feeToCharge = Config.dataWriteCharge / Config.ETHToUSDExchangeRate
-    //         encryptedData.value = this.encrypt(data.value, privateKey)
-    //     } else if (data.value == '' && data.ipfsHash != '') {
-    //         feeToCharge = Config.fileUploadCharge / Config.ETHToUSDExchangeRate
-    //         encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
-    //     }
-
-    //     return storageContract.addData.estimateGas(data.key, encryptedData.value, encryptedData.ipfsHash, {
-    //         from: mAccounts[0],
-    //         value: web3.toWei(feeToCharge, 'ether'),
-    //         gasPrice: gasPrice
-    //     }, ((error, result) => {
-    //         if (error != null) {
-    //             console.log(error)
-    //         } else {
-    //             console.log("Estimated startGas: " + result)
-    //             this.setState({ gasLimit: result })
-    //             this.setState({ currentStatus: "Gas estimated." })
-    //             this.openConfirmationDialog()
-    //         }
-    //     }))
-    // }
-
-    // getGasPrice() {
-    //     web3.eth.getGasPrice(((err, res) => {
-    //         gasPrice = res
-    //     }))
-    // }
-
-    // addData() {
-    //     this.setState({ currentStatus: "Adding data. Please wait.." })
-    //     if (data.ipfsHash != '') {
-    //         encryptedData.ipfsHash = this.encrypt(data.ipfsHash, privateKey)
-    //     }
-    //     return storageContract.addData(data.key, encryptedData.value, encryptedData.ipfsHash, {
-    //         from: mAccounts[0],
-    //         // gas: this.state.gasLimit,
-    //         // gasPrice: gasPrice,
-    //         // value: web3.toWei(feeToCharge, 'ether')
-    //     }, ((error, result) => {
-    //         if (error === null) {
-    //             this.setState({ currentStatus: "Transaction has gone through. Please wait for it to mine.." })
-    //             alert("Transaction has gone through. You can check the status at ropsten.etherscan.io/tx/" + result)
-    //             var event = storageContract.DataAdded()
-    //             event.watch((err, res) => {
-    //                 if (err === null) {
-    //                     this.setState({ currentStatus: "Transaction has been mined. You can read the data now." })
-    //                     alert("Transaction has been mined.")
-    //                 }
-    //             })
-    //         }
-    //     }))
-    // }
 
     onSaveData(event) {
         event.preventDefault();
         
-        // if (data.value === '' && data.ipfsHash === '') {
-        //     alert("Please enter data or select file to upload")
-        //     return
-        // }
-
         if (fileHash === '') {
             alert("Please select file to upload")
             return
         }
-        // if (data.key === ''
-        //     ||mAccounts[0] === ''
-        //     || privateKey === ''
-        // ) 
+       
         if (mAccounts[0] === '' || privateKey === '') {
             alert("All the fields are required");
             return
@@ -216,33 +114,11 @@ class Write extends Component {
             return
         }
 
-        // this.setState({ currentStatus: "Estimating gas.." })
-        // this.estimateGas()
+        else{
+            console.log("done here");
+            this.uploadFile();
+        }
     }
-
-    // openConfirmationDialog() {
-    //     var retVal = confirm("Transaction cost will be $" + ((gasPrice * this.state.gasLimit) / factor + feeToCharge * Config.ETHToUSDExchangeRate) + ". Do you want to continue ?");
-    //     if (retVal == true) {
-    //         if (data.ipfsHash != 0) {
-    //             this.uploadFile()
-    //         }
-    //         else {
-    //             this.addData()
-    //         }
-    //         return true;
-    //     }
-    //     else {
-    //         return false;
-    //     }
-    // }
-
-    // onKeyChange(event) {
-    //     data.key = event.target.value
-    // }
-
-    // onValueChange(event) {
-    //     data.value = event.target.value
-    // }
 
     onPrivateKeyChange(event) {
         privateKey = event.target.value
@@ -251,7 +127,6 @@ class Write extends Component {
     uploadFile = async () => {
         this.setState({ currentStatus: "Encrypting and uploading file. Please wait.." })
         var encrypted = CryptoJS.AES.encrypt(fileContent, privateKey)
-        // var encrypted = this.encrypt(fileContent.toString(), privateKey)
 
         var eFile = new File([encrypted.toString()], "file.encrypted", { type: "text/plain" })
         let eReader = new FileReader()
@@ -265,37 +140,40 @@ class Write extends Component {
         event.stopPropagation()
         event.preventDefault()
         const file = event.target.files[0]
+        fileName = file.name;
+        console.log(fileName);
         let reader = new window.FileReader()
         reader.readAsDataURL(file)
 
-        // reader.onloadend = (e) => {
-        //     fileContent = e.target.result;
-        //     data.ipfsHash = 'QmVunwR4mvC4F5eTYWCGU3Baq9kmaTyRPot6nRGp24D4aJ'
-        // }
         reader.onloadend = (e) => {
             fileContent = e.target.result;
-            var md5 = CryptoJS.MD5(fileContent);
-            fileHash = md5;
+            // var md5 = CryptoJS.MD5(fileContent);
+            // fileHash = md5;
+            // this.setState({ HashStateMessage: fileHash })
+
+            // console.log(
+            //     sha256(
+            //       utf8.encode(fileContent)
+            //     )
+            //   );
         }
+
     };
 
     convertToBuffer = async (reader) => {
         const buffer = await Buffer.from(reader.result);
         this.setState({ buffer: buffer });
 
-        // await ipfs.add(this.state.buffer, (err, ipfsHash) => {
-        //     if (err == null) {
-        //         data.ipfsHash = ipfsHash[0].hash
-        //         this.addData()
-        //     } else {
-        //         console.log(err);
-        //     }
-        // })
-
-        let storageRef = storage.ref("safe-vault");
+        let storageRef = storage.ref(fileName);
         let file = this.state.buffer;
+        let that = this;
         storageRef.put(file).then(function(snapshot){
             console.log('Uploaded a Blob or File');
+            that.setState({ currentStatus: "File Uploaded" })
+
+        })
+        .catch(err => {
+            console.log(err)
         });
     };
 
@@ -309,11 +187,6 @@ class Write extends Component {
                             <Label style={{ color: 'blue' }}>Save any information on the blockchain fully encrypted. Please remember your private key as this will be used to decrypt and read your information when you need it. Use Safe-Vault to save contracts and other important information that need to be public, but secure and encrypted. BlockSave is useful for Legal, Real Estate, Insurance, Financial contracts and for many other industries.</Label>
                             <br />
                             <br />
-                            {/* <Label style={{ color: 'blue' }}>Please enter a key that you can use later to read back your information, this is like an index key</Label>
-                            <br />
-                            <Input s={12} type='text' onChange={this.onKeyChange.bind(this)} name='ID1' label="Enter Key here" />
-                            <Label style={{ color: 'blue' }}>Either type or copy and paste any text here that you would like stored and encrypted on the blockchain</Label>
-                            <textarea rows="30" style={{ "height": "250px", "maxHeight": "700px" }} maxLength="3000" className="textarea" type='text' onChange={this.onValueChange.bind(this)} label="Value" name='ID2' /> */}
                             <Label style={{ color: 'blue' }}>Please select a document, preferably a pdf, to store and upload. The document will be encrypted to protect it</Label>
                             <br />
                             <input
@@ -325,6 +198,8 @@ class Write extends Component {
                             <Label style={{ color: 'blue' }}>Please enter a password here that will be ued to encrypt your data and file. Do not forget this password as you will need it to read your data or file later</Label>
                             <Input s={12} type="password" onChange={this.onPrivateKeyChange.bind(this)} name='privateKey' label="Enter Private Key here (used to encrypt data)" />
                             <br />
+                            {/* <Label style={{ fontSize: '20px', color: 'red' }}>{this.state.HashStateMessage}</Label>                            <br />
+                            <br /> */}
                             <Label style={{ fontSize: '20px', color: 'red' }}>{this.state.currentStatus}</Label>
                             <br />
                             <Row>
