@@ -67,6 +67,7 @@
     "react-dom": "^15.4.2",
     "react-expanding-textarea": "^0.1.10",
     "react-newline-to-break": "^1.0.6",
+    "sha-256-js": "^1.0.3",
     "utf8": "^3.0.0"
   },
   "scripts": {

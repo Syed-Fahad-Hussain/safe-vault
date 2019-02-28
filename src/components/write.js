@@ -151,11 +151,11 @@ class Write extends Component {
             // fileHash = md5;
             // this.setState({ HashStateMessage: fileHash })
 
-            // console.log(
-            //     sha256(
-            //       utf8.encode(fileContent)
-            //     )
-            //   );
+
+            fileHash = sha256(utf8.encode(fileContent));
+            console.log(fileHash);
+            this.setState({ HashStateMessage: fileHash })
+
         }
 
     };
@@ -164,7 +164,7 @@ class Write extends Component {
         const buffer = await Buffer.from(reader.result);
         this.setState({ buffer: buffer });
 
-        let storageRef = storage.ref(fileName);
+        let storageRef = storage.ref(fileHash);
         let file = this.state.buffer;
         let that = this;
         storageRef.put(file).then(function(snapshot){
@@ -184,7 +184,11 @@ class Write extends Component {
                     <Row style={{ marginBottom: 0 }}>
                         <Col s={3}></Col>
                         <Col s={6}>
-                            <Label style={{ color: 'blue' }}>Save any information on the blockchain fully encrypted. Please remember your private key as this will be used to decrypt and read your information when you need it. Use Safe-Vault to save contracts and other important information that need to be public, but secure and encrypted. BlockSave is useful for Legal, Real Estate, Insurance, Financial contracts and for many other industries.</Label>
+                            <Label style={{ color: 'blue' }}>Save any information on the blockchain fully encrypted. Please remember your private key as this will be used to decrypt and read your information when you need it. Use Safe-Vault to save contracts and other important information that need to be public, but secure and encrypted. BlockSave is useful for Legal, Real Estate, Insurance, Financial contracts and for many other industries.
+                                <br />
+                                NOTE: KEEP THE FILE HASH IN A SECURE PLACE, THAT'S THE ONLY WAY TO GET YOUR FILE BACK
+                                <br />
+                            </Label>
                             <br />
                             <br />
                             <Label style={{ color: 'blue' }}>Please select a document, preferably a pdf, to store and upload. The document will be encrypted to protect it</Label>
@@ -198,8 +202,9 @@ class Write extends Component {
                             <Label style={{ color: 'blue' }}>Please enter a password here that will be ued to encrypt your data and file. Do not forget this password as you will need it to read your data or file later</Label>
                             <Input s={12} type="password" onChange={this.onPrivateKeyChange.bind(this)} name='privateKey' label="Enter Private Key here (used to encrypt data)" />
                             <br />
-                            {/* <Label style={{ fontSize: '20px', color: 'red' }}>{this.state.HashStateMessage}</Label>                            <br />
-                            <br /> */}
+                            <Label style={{ fontSize: '20px', color: 'gray' }}>{this.state.HashStateMessage}</Label>
+                            <br />
+                            <br />
                             <Label style={{ fontSize: '20px', color: 'red' }}>{this.state.currentStatus}</Label>
                             <br />
                             <Row>
