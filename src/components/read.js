@@ -4,7 +4,7 @@ import { Label } from 'react-bootstrap'
 import nl2br from 'react-newline-to-break';
 import CryptoJS from 'crypto-js';
 import mime from 'mime-types';
-
+import { storage } from '../config/firebaseConfiguration';
 import getWeb3 from '../utils/getWeb3'
 
 // Current test contract on Ropsten testnet
@@ -92,15 +92,15 @@ class Read extends Component {
     }
 
     getData() {
-        // return storageContract.getData.call(key, { from: mAccounts[0] }, ((error, result) => {
-            return storageContract.getData.call(fileHash, { from: mAccounts[0] }, ((error, result) => {
+              // return storageContract.getData.call(key, { from: mAccounts[0] }, ((error, result) => {
+        return storageContract.getData.call(fileHash, { from: mAccounts[0] }, ((error, result) => {
             var decryptedData = this.decrypt(result[0], privateKey).toString(CryptoJS.enc.Utf8)
-            // fileHash = this.decrypt(result[1], privateKey).toString(CryptoJS.enc.Utf8)
             this.setState({
                 value: decryptedData
             })
             this.setState({ currentStatus: "Data read." })
         }))
+    
     }
 
     onReadData(event) {
@@ -132,11 +132,12 @@ class Read extends Component {
             alert("File not available.")
             return
         }
+        
         this.setState({ currentStatus: "Downloading file. Please wait.." })
         var link = document.createElement("a");
-        link.download = fileHash;
+        // link.download = fileHash;
         // link.href = "https://ipfs.io/ipfs/" + fileHash;
-        link.href = "https://safe-vault-with-tokens.firebaseio.com/"+ fileHash;
+        link.href = 'https://firebasestorage.googleapis.com/v0/b/safe-vault-with-tokens.appspot.com/o/' + fileHash + "?alt=media&token=234ab920-5365-45f9-8f23-37100eef24ad";
 
         document.body.appendChild(link);
 
@@ -148,21 +149,23 @@ class Read extends Component {
             eReader.readAsText(request.response);
             eReader.onload = (e) => {
                 this.setState({ currentStatus: "Decrypting file. Please wait.." })
+                console.log(e.target.result);
                 var decrypted = CryptoJS.AES.decrypt(e.target.result, privateKey).toString(CryptoJS.enc.Latin1);
-                // var decrypted = this.decrypt(e.target.result.toString(), privateKey)
+                // var decrypted = this.decrypt(e.target.result, privateKey).toString(CryptoJS.enc.Utf8);
+                console.log(decrypted);
                 var a = document.createElement("a");
                 a.href = decrypted;
 
-                if (!decrypted.toString().includes("data")) {
-                    alert("Error in decryption. Most likely caused by the wrong private key.")
-                    return;
-                }
+                // if (!decrypted.toString().includes("data")) {
+                //     alert("Error in decryption. Most likely caused by the wrong private key.")
+                //     return;
+                // }
 
-                let split1 = decrypted.toString().split("data:")
-                let split2 = split1[1].split(";base64")
-                let type = split2[0]
+                // let split1 = decrypted.toString().split("data:")
+                // let split2 = split1[1].split(";base64")
+                // let type = split2[0]
 
-                a.download = fileHash + '.' + mime.extension(type)
+                a.download = fileHash;// + '.' + mime.extension(type)
                 document.body.appendChild(a);
                 a.click();
 
