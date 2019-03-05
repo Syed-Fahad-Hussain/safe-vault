@@ -2,14 +2,13 @@ import React, { Component } from 'react';
 import { Tab, Tabs, Input, Row, Button, Col } from 'react-materialize';
 import { Label } from 'react-bootstrap'
 import { Nav, NavItem } from 'react-bootstrap';
-import Textarea from 'react-expanding-textarea'
 import CryptoJS from 'crypto-js';
 import getWeb3 from '../utils/getWeb3'
 import Config from '../config/config'
 
-import ipfs from '../ipfs';
 import { read } from 'fs';
 import { storage } from '../config/firebaseConfiguration';
+//import StorageController from "../interface/storageController";
 const sha256 = require('sha-256-js');
 const utf8 = require('utf8');
 
@@ -50,7 +49,6 @@ class Write extends Component {
             .then(results => {
                 web3 = results.web3
                 this.instantiateContract()
-                // this.getGasPrice()
             })
             .catch(() => {
                 console.log('Error finding web3.')
@@ -147,10 +145,6 @@ class Write extends Component {
 
         reader.onloadend = (e) => {
             fileContent = e.target.result;
-            // var md5 = CryptoJS.MD5(fileContent);
-            // fileHash = md5;
-            // this.setState({ HashStateMessage: fileHash })
-
 
             fileHash = sha256(utf8.encode(fileContent));
             console.log(fileHash);
@@ -170,11 +164,15 @@ class Write extends Component {
         storageRef.put(file).then(function(snapshot){
             console.log('Uploaded a Blob or File');
             that.setState({ currentStatus: "File Uploaded" })
-
         })
         .catch(err => {
             console.log(err)
         });
+
+        // await StorageController.methods
+        // .addData(fileHash).on('confirmation', function(){
+        //     console.log("Transaction confirmed");
+        //     });    
     };
 
     render() {
@@ -186,7 +184,7 @@ class Write extends Component {
                         <Col s={6}>
                             <Label style={{ color: 'blue' }}>Save any information on the blockchain fully encrypted. Please remember your private key as this will be used to decrypt and read your information when you need it. Use Safe-Vault to save contracts and other important information that need to be public, but secure and encrypted. BlockSave is useful for Legal, Real Estate, Insurance, Financial contracts and for many other industries.
                                 <br />
-                                NOTE: KEEP THE FILE HASH IN A SECURE PLACE, THAT'S THE ONLY WAY TO GET YOUR FILE BACK
+                               
                                 <br />
                             </Label>
                             <br />
@@ -202,11 +200,16 @@ class Write extends Component {
                             <Label style={{ color: 'blue' }}>Please enter a password here that will be ued to encrypt your data and file. Do not forget this password as you will need it to read your data or file later</Label>
                             <Input s={12} type="password" onChange={this.onPrivateKeyChange.bind(this)} name='privateKey' label="Enter Private Key here (used to encrypt data)" />
                             <br />
-                            <Label style={{ fontSize: '20px', color: 'gray' }}>{this.state.HashStateMessage}</Label>
+                            <div/>
+                                <Label style={{ fontSize: '20px', color: 'gray' }}>{this.state.HashStateMessage}</Label>
+                            <div />
+                            <br />
+                            <Label style={{ color: 'red' }}> NOTE: KEEP THE FILE HASH IN A SECURE PLACE, THAT'S THE ONLY WAY TO GET YOUR FILE BACK</Label>
                             <br />
                             <br />
                             <Label style={{ fontSize: '20px', color: 'red' }}>{this.state.currentStatus}</Label>
                             <br />
+                           
                             <Row>
                                 <Col s={4}></Col>
                                 <Col s={4}>
