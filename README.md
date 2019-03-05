@@ -1,2 +1,2 @@
 # SafeVault
-Upload data and files to IPFS with timestamping on Ethereum Blockchain.
+Upload files to cloud storage with timestamping on Ethereum Blockchain.
