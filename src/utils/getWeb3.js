@@ -18,7 +18,8 @@ let getWeb3 = new Promise(function(resolve, reject) {
     } else {
       console.log("Metamask not installed")
       alert("Metamask not installed on your browser. Please refresh the page after installing.")
-      var provider = new Web3.providers.HttpProvider('http://127.0.0.1:8545')
+      // var provider = new Web3.providers.HttpProvider('http://127.0.0.1:8545')
+      var provider = new Web3.providers.HttpProvider('https://rinkeby.infura.io/e7cc830da9f546b29a0f80a94a2e8cc6')
       web3 = new Web3(provider)
 
       results = {
