@@ -2,8 +2,9 @@ import React, {Component} from 'react';
 import {Input, Row, Button, Col} from 'react-materialize';
 import {Label} from 'react-bootstrap'
 import CryptoJS from 'crypto-js';
-import mime from 'mime-types';
 import getWeb3 from '../utils/getWeb3'
+import StorageController from "../interface/storageController";
+
 
 var mAccounts
 var web3 = null
@@ -43,7 +44,6 @@ class Read extends Component {
             setInterval(function () {
                 if (web3.eth.accounts[0] !== mAccounts[0]) {
                     mAccounts = web3.eth.accounts;
-                    // alert("Please reload the page.");
                 }
             }, 100);
         })
@@ -63,23 +63,28 @@ class Read extends Component {
             iv: iv,
             padding: CryptoJS.pad.Pkcs7,
             mode: CryptoJS.mode.CBC
-
         })
         return decrypted;
     }
 
-    onReadData(event) {
-        event.preventDefault();
-        if (fileHash === '' || privateKey === '') {
-            alert("All fields are required");
-        } else {
-            this.setState({currentStatus: "Reading data.."})
-        }
+    async getData() {
+        const accounts = await web3.eth.getAccounts();
+        await StorageController.methods
+            .data(accounts[0]).call().then(Hash => {
+                fileHash = Hash;
+            });
     }
 
+    async onReadData(event) {
+        event.preventDefault();
 
-    onFileHashChange(event) {
-        fileHash = event.target.value
+        await this.getData();
+        this.setState({currentStatus: "Reading data.."})
+    }
+
+    async onButtonClick(event) {
+        await this.onReadData(event);
+        this.onDownloadFile(event);
     }
 
     onPrivateKeyChange(event) {
@@ -88,16 +93,14 @@ class Read extends Component {
 
     onDownloadFile(event) {
         event.preventDefault();
-        if (fileHash === '') {
-            alert("File not available.")
+        if (privateKey === '') {
+            alert("Incorrect Private key")
             return
         }
 
         this.setState({currentStatus: "Downloading file. Please wait.."})
         var link = document.createElement("a");
-        // link.download = fileHash;
         link.href = 'https://firebasestorage.googleapis.com/v0/b/safe-vault-with-tokens.appspot.com/o/' + fileHash + "?alt=media&token=234ab920-5365-45f9-8f23-37100eef24ad";
-
         document.body.appendChild(link);
 
         var request = new XMLHttpRequest();
@@ -108,9 +111,7 @@ class Read extends Component {
             eReader.readAsText(request.response);
             eReader.onload = (e) => {
                 this.setState({currentStatus: "Decrypting file. Please wait.."})
-                console.log(e.target.result);
                 var decrypted = CryptoJS.AES.decrypt(e.target.result, privateKey).toString(CryptoJS.enc.Latin1);
-                console.log(decrypted);
                 var a = document.createElement("a");
                 a.href = decrypted;
 
@@ -123,7 +124,7 @@ class Read extends Component {
                 let split2 = split1[1].split(";base64")
                 let type = split2[0]
 
-                a.download = fileHash;// + '.' + mime.extension(type);
+                a.download = fileHash;
                 document.body.appendChild(a);
                 a.click();
 
@@ -136,7 +137,7 @@ class Read extends Component {
     render() {
         return (
             <div>
-                <form onSubmit={this.onReadData.bind(this)}>
+                <form>
                     <Row style={{marginBottom: 0}}>
                         <Col s={3}></Col>
                         <Col s={6}>
@@ -144,11 +145,6 @@ class Read extends Component {
                                 when you stored it using Write</Label>
                             <Input s={12} type='password' onChange={this.onPrivateKeyChange.bind(this)}
                                    name='privateKey' label="Enter Private Key here (used to decrypt data)"/>
-                            <br/>
-                            <Label style={{color: 'blue'}}>Please enter the Hash key in order to match your data or
-                                file</Label>
-                            <Input s={12} type='text' name='EntryID' onChange={this.onFileHashChange.bind(this)}
-                                   label="Enter HashKey here"/>
                             <br/>
                             <div>
                                 <Label style={{fontSize: '20px', color: 'red'}}>{this.state.currentStatus}</Label>
@@ -158,7 +154,7 @@ class Read extends Component {
                                 <Row>
                                     <Col>
                                         <br/>
-                                        <Button onClick={this.onDownloadFile.bind(this)}
+                                        <Button onClick={this.onButtonClick.bind(this)}
                                                 className="btn waves-effect waves-light"
                                                 style={{backgroundColor: '#145CFF', marginLeft: '300px'}}>Download
                                             File</Button>

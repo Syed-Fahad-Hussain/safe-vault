@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {Input, Row, Button, Col} from 'react-materialize';
-// import Snackbar from '@material-ui/core/Snackbar';
 import {Label} from 'react-bootstrap';
 import CryptoJS from 'crypto-js';
 import getWeb3 from '../utils/getWeb3'
@@ -40,11 +39,6 @@ class Write extends Component {
     };
 
     async componentDidMount() {
-
-        // await StorageController.methods
-        //     .getDataWriteCharges().call().then(a => {
-        //         console.log(a, "okay ki report ha boss");
-        //     });
         this.checkweb3();
     }
 
@@ -68,7 +62,6 @@ class Write extends Component {
             setInterval(function () {
                 if (web3.eth.accounts[0] !== mAccounts[0]) {
                     mAccounts = web3.eth.accounts;
-                    // alert("Please reload the page to reflect the changes.");
                 }
             }, 100);
         })
@@ -113,7 +106,6 @@ class Write extends Component {
             alert("Metamask not set up")
             return
         } else {
-            console.log("done here");
             this.uploadFile();
         }
     }
@@ -139,7 +131,6 @@ class Write extends Component {
         event.preventDefault()
         const file = event.target.files[0]
         fileName = file.name;
-        console.log(fileName);
         let reader = new window.FileReader()
         reader.readAsDataURL(file)
 
@@ -147,7 +138,6 @@ class Write extends Component {
             fileContent = e.target.result;
 
             fileHash = sha256(utf8.encode(fileContent));
-            console.log(fileHash);
             this.setState({HashStateMessage: fileHash})
 
         }
@@ -174,7 +164,6 @@ class Write extends Component {
             .addData(fileHash).send({
                 from: accounts[0]
             }).on('transactionHash', (hash) => {
-                console.log(hash)
                 that.setState({transactionHash: 'https://rinkeby.etherscan.io/tx/' + hash})
             }).on('confirmation', function () {
                 console.log("Transaction confirmed");
@@ -194,9 +183,7 @@ class Write extends Component {
                                 information that need to be public, but secure and encrypted. BlockSave is useful for
                                 Legal, Real Estate, Insurance, Financial contracts and for many other industries.
                                 <br/>
-
                             </Label>
-                            <br/>
                             <br/>
                             <Label style={{color: 'blue'}}>Please select a document, preferably a pdf, to store and
                                 upload. The document will be encrypted to protect it</Label>
@@ -213,24 +200,10 @@ class Write extends Component {
                             <Input s={12} type="password" onChange={this.onPrivateKeyChange.bind(this)}
                                    name='privateKey' label="Enter Private Key here (used to encrypt data)"/>
                             <br/>
-                            <div/>
-                            <Label style={{fontSize: '20px', color: 'gray'}}>{this.state.HashStateMessage}</Label>
-                            <div/>
-                            <br/>
-                            <Label style={{color: 'red'}}> NOTE: KEEP THE FILE HASH IN A SECURE PLACE, THAT'S THE ONLY
-                                WAY TO GET YOUR FILE BACK</Label>
                             <br/>
                             <br/>
                             <Label style={{fontSize: '20px', color: 'red'}}>{this.state.currentStatus}</Label>
                             <br/>
-                            {(this.state.transactionHash) ? (<div><h3>Track Your Transaction here</h3>
-                            <a href={this.state.transactionHash} target="_blank">{this.state.transactionHash}</a>
-                            </div>) : (null)}
-                            {/*<div>*/}
-                                {/*<Label style={{fontSize: '20px', color: 'Blue'}}>{"Track Your Transaction here"}</Label>*/}
-                                {/*<Label style={{fontSize: '20px', color: 'Blue'}}>{this.state.transactionHash}</Label>*/}
-                            {/*</div>*/}
-
                             <Row>
                                 <Col s={4}></Col>
                                 <Col s={4}>
@@ -241,18 +214,18 @@ class Write extends Component {
                                 </Col>
                                 <Col s={4}></Col>
                             </Row>
-
-                            <Label style={{color: 'blue'}}> To check your token, put the below address in your Metamask
+                            {(this.state.transactionHash) ? (<div>
+                                <Label style={{color: 'blue'}}> Track Your Transaction here: </Label><br/>
+                                <a href={this.state.transactionHash} target="_blank">{this.state.transactionHash}</a>
                                 <br/>
-                                0xbc279bc14c37c0e918c2f54c6980d14125008cf8
-                            </Label>
+                                <Label style={{color: 'blue'}}> To check your token, put the below address in your
+                                    Metamask
+                                    <br/>
+                                    0xb3a8db32c23b2a5953a8c216031f39795720cdf6
+                                </Label>
+                            </div>) : (null)}
 
-                            {/*<Snackbar*/}
-                            {/*open={this.state.open}*/}
-                            {/*message="Transaction Confirmed"*/}
-                            {/*autoHideDuration={4000}*/}
-                            {/*onRequestClose={this.handleRequestClose}*/}
-                            {/*/>*/}
+
                         </Col>
                         <Col s={3}></Col>
                     </Row>
@@ -261,6 +234,5 @@ class Write extends Component {
         )
     }
 }
-
 
 export default (Write);

@@ -6,15 +6,13 @@ contract Storage is Owned {
 
     event DataAdded(string fileHash);
 
-    mapping(address => string) internal data;
+    mapping(address => string) public data;
     Token public token;
     uint public numberOfTokens = 1;
-
 
     constructor(address _tokenAddress) public {
         owner = msg.sender;
         token = Token(_tokenAddress);
-
     }
 
     function addData(string memory _fileHash) public {
@@ -24,11 +22,6 @@ contract Storage is Owned {
         address user = msg.sender;
         token.mintTokens(user, numberOfTokens);
         emit DataAdded(_fileHash);
-    }
-
-
-    function getData() public view returns (string) {
-        return (data[msg.sender]);
     }
 
     function setNumberOfTokens(uint _numberOfTokens) public onlyOwner {
