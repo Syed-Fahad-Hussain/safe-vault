@@ -15,9 +15,12 @@ Upload files to cloud storage with timestamping on Ethereum Blockchain.
    If you donot have Metamask installed in your browser, Do follow the link.
    - https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en
 
-5. Upload file to the app, from the upload file section.
+5. If you are using this application via loalhost:3000, You need to install the CORS chrome extension. Here is the link below,
+   - https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi/related?hl=en
 
-6. To check token put the token address in your metamask.
+6. Upload file to the app, from the upload file section.
+
+7. To check token put the token address in your metamask.
    If you are new in metamask and don't know how to see your tokens in Metamask, DO follow the instructions.
    - click on metamask.
    - Go to the menu.
