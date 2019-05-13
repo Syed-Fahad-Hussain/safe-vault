@@ -15,7 +15,7 @@ Upload files to cloud storage with timestamping on Ethereum Blockchain.
    If you donot have Metamask installed in your browser, Do follow the link.
    - https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en
 
-5. If you are using this application via loalhost:3000, You need to install the CORS chrome extension. Here is the link below,
+5. If you are using this application via localhost:3000, You need to install the CORS chrome extension. Here is the link below,
    - https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi/related?hl=en
 
 6. Upload file to the app, from the upload file section.
